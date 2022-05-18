@@ -10,19 +10,33 @@ const { validateFields } = require("../middlewares");
 const {
   existRoleId,
   mailRegistered,
-} = require("../helpers/db-validator.helper");
+} = require("../helpers/db-validators.helper");
+
+const {
+  paramNumericPositive,
+  statusValidator,
+} = require("../helpers/param-validators.helper");
 
 const router = Router();
 
-router.get("/", getUser);
+router.get(
+  "/",
+  [
+    check("limit").custom(paramNumericPositive),
+    check("from").custom(paramNumericPositive),
+    check("status").custom(statusValidator),
+    validateFields,
+  ],
+  getUser
+);
 
 router.post(
   "/",
   [
-    check("role", "El role es obligatorio").notEmpty(),
-    check("name", "El nombre es obligatorio").notEmpty(),
-    check("surname", "El apellido es obligatorio").notEmpty(),
-    check("mail", "El correo es obligatorio").notEmpty(),
+    check("role", "Este campo es obligatorio").notEmpty(),
+    check("name", "Este campo es obligatorio").notEmpty(),
+    check("surname", "Este campo es obligatorio").notEmpty(),
+    check("mail", "Este campo es obligatorio").notEmpty(),
     check("role", "No es un ID válido").isMongoId(),
     check("role").custom(existRoleId),
     check(

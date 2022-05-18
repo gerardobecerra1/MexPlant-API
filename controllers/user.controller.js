@@ -2,6 +2,26 @@ const bcryptjs = require("bcryptjs");
 const { response, request } = require("express"); // Para reconocer los metodos de estatus y json
 const User = require("../models/user.model");
 
+const userDocuments = (query = "", limit = 0, from = 0) => {
+  from = from > 0 ? from - 1 : from;
+  if (limit != 0) {
+    if (from != 0) {
+      return User.find(query)
+        .skip(Number(from))
+        .limit(Number(limit))
+        .populate("role", "name");
+    } else {
+      return User.find(query).limit(Number(limit)).populate("role", "name");
+    }
+  } else {
+    if (from != 0) {
+      return User.find(query).skip(Number(from)).populate("role", "name");
+    } else {
+      return User.find(query).populate("role", "name");
+    }
+  }
+};
+
 const getUser = async (req = request, res = response) => {
   const { limit = 0, from = 0, status = true } = req.query;
 
@@ -9,34 +29,8 @@ const getUser = async (req = request, res = response) => {
   const query = { activated: status };
 
   const [total, users] = await Promise.all([
-    // User.countDocuments(query),
-    limit != 0
-      ? from != 0
-        ? User.find(query)
-            .skip(Number(from))
-            .limit(Number(limit))
-            .populate("role", "name")
-            .countDocuments(query)
-        : User.find(query)
-            .limit(Number(limit))
-            .populate("role", "name")
-            .countDocuments(query)
-      : from != 0
-      ? User.find(query)
-          .skip(Number(from))
-          .populate("role", "name")
-          .countDocuments(query)
-      : User.find(query).populate("role", "name").countDocuments(query),
-    limit != 0
-      ? from != 0
-        ? User.find(query)
-            .skip(Number(from))
-            .limit(Number(limit))
-            .populate("role", "name")
-        : User.find(query).limit(Number(limit)).populate("role", "name")
-      : from != 0
-      ? User.find(query).skip(Number(from)).populate("role", "name")
-      : User.find(query).populate("role", "name"),
+    userDocuments(query, limit, from, status).countDocuments(query),
+    userDocuments(query, limit, from, status),
   ]);
 
   res.json({ msg: "Get User - Controller", total, users });
