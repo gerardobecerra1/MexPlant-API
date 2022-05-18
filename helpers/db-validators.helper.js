@@ -21,10 +21,12 @@ const existUserId = async (id = "") => {
   }
 };
 
-const isAcitive = async (id = "") => {
+const isActive = async (id = "") => {
   const user = await User.findById(id);
   if (!user.activated) {
-    throw new Error(`El usuario con id: '${id}' ya se encuentra inactivo`);
+    throw new Error(
+      `El usuario con id:'${id}' se encuentra inactivo, no se le pueden hacer ningún cambio`
+    );
   }
 };
 
@@ -32,5 +34,5 @@ module.exports = {
   existRoleId,
   mailRegistered,
   existUserId,
-  isAcitive,
+  isActive,
 };

@@ -11,7 +11,7 @@ const {
   existRoleId,
   mailRegistered,
   existUserId,
-  isAcitive,
+  isActive,
 } = require("../helpers/db-validators.helper");
 
 const {
@@ -60,6 +60,7 @@ router.put(
   [
     check("id", "No es un ID válido").isMongoId(),
     check("id").custom(existUserId),
+    check("id").custom(isActive),
     check(
       "password",
       "El password es obligatorio y debe contener almenos 8 caracteres"
@@ -74,7 +75,7 @@ router.delete(
   [
     check("id", "No es un ID válido").isMongoId(),
     check("id").custom(existUserId),
-    check("id").custom(isAcitive),
+    check("id").custom(isActive),
     validateFields,
   ],
   deleteUser
