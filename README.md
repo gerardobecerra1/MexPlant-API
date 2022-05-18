@@ -9,3 +9,7 @@ Recuerda que debes ejecutar `npm install` para reconstruir los modulos de Node.
 3.-Instalamos "cors" para que a nuestra API podamos dar acceso solo a ciertas personas o a todo el mundo o bien para que los navegadores no tomen la pagína como desconfiable, con el comando `npm i cors`.
 
 4.-Instalamos "mogoose" para que a nuestra API pueda conectarse y hacer un CRUD para nuestra RESTAPI, con el comando `npm i mongoose`.
+
+5.-Instalamos "bcryptjs" para que a nuestra API pueda encriptar campos como el password, con el comando `npm i bcryptjs`.
+
+6.-Instalamos "express-validator" para que a nuestra API valide campos con el formato correcto como el correo, con el comando `npm i express-validator`.
