@@ -2,9 +2,44 @@ const bcryptjs = require("bcryptjs");
 const { response, request } = require("express"); // Para reconocer los metodos de estatus y json
 const User = require("../models/user.model");
 
-const getUser = (req = request, res = response) => {
-  const { from = 0, until = 0, limit = 0 } = req.query;
-  res.json({ msg: "Get User - Controller", from, until, limit });
+const getUser = async (req = request, res = response) => {
+  const { limit = 0, from = 0, status = true } = req.query;
+
+  //Obtenemos dependiendo si estan activos o no
+  const query = { activated: status };
+
+  const [total, users] = await Promise.all([
+    // User.countDocuments(query),
+    limit != 0
+      ? from != 0
+        ? User.find(query)
+            .skip(Number(from))
+            .limit(Number(limit))
+            .populate("role", "name")
+            .countDocuments(query)
+        : User.find(query)
+            .limit(Number(limit))
+            .populate("role", "name")
+            .countDocuments(query)
+      : from != 0
+      ? User.find(query)
+          .skip(Number(from))
+          .populate("role", "name")
+          .countDocuments(query)
+      : User.find(query).populate("role", "name").countDocuments(query),
+    limit != 0
+      ? from != 0
+        ? User.find(query)
+            .skip(Number(from))
+            .limit(Number(limit))
+            .populate("role", "name")
+        : User.find(query).limit(Number(limit)).populate("role", "name")
+      : from != 0
+      ? User.find(query).skip(Number(from)).populate("role", "name")
+      : User.find(query).populate("role", "name"),
+  ]);
+
+  res.json({ msg: "Get User - Controller", total, users });
 };
 
 const createUser = async (req = request, res = response) => {
