@@ -10,6 +10,8 @@ const { validateFields } = require("../middlewares");
 const {
   existRoleId,
   mailRegistered,
+  existUserId,
+  isAcitive,
 } = require("../helpers/db-validators.helper");
 
 const {
@@ -53,8 +55,29 @@ router.post(
   createUser
 );
 
-router.put("/:id", updateUser);
+router.put(
+  "/:id",
+  [
+    check("id", "No es un ID válido").isMongoId(),
+    check("id").custom(existUserId),
+    check(
+      "password",
+      "El password es obligatorio y debe contener almenos 8 caracteres"
+    ).isLength({ min: 8 }),
+    validateFields,
+  ],
+  updateUser
+);
 
-router.delete("/:id", deleteUser);
+router.delete(
+  "/:id",
+  [
+    check("id", "No es un ID válido").isMongoId(),
+    check("id").custom(existUserId),
+    check("id").custom(isAcitive),
+    validateFields,
+  ],
+  deleteUser
+);
 
 module.exports = router;

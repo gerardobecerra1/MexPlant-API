@@ -14,7 +14,23 @@ const mailRegistered = async (mail = "") => {
   }
 };
 
+const existUserId = async (id = "") => {
+  const idExist = await User.findById(id);
+  if (!idExist) {
+    throw new Error(`El ID: '${id}' no existe`);
+  }
+};
+
+const isAcitive = async (id = "") => {
+  const user = await User.findById(id);
+  if (!user.activated) {
+    throw new Error(`El usuario con id: '${id}' ya se encuentra inactivo`);
+  }
+};
+
 module.exports = {
   existRoleId,
   mailRegistered,
+  existUserId,
+  isAcitive,
 };

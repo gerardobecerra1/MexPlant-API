@@ -56,14 +56,31 @@ const createUser = async (req = request, res = response) => {
   res.status(201).json({ msg: "Create User - Controller", userCreated }); //Si no agregamos status por defecto enviara un Ok:200
 };
 
-const updateUser = (req = request, res = response) => {
+const updateUser = async (req = request, res = response) => {
   const { id } = req.params;
-  res.json({ msg: "Update User - Controller", id });
+  const { role, _id, mail, password, google, ...rest } = req.body;
+
+  //TODO Validar contra la base de datos
+  if (password) {
+    //Encriptamos la contraseña
+    const salt = bcryptjs.genSaltSync(10);
+    //Nueva contraseña
+    rest.password = bcryptjs.hashSync(password, salt);
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(id, rest, { new: true });
+
+  res.json({ msg: "Update User - Controller", updatedUser });
 };
 
-const deleteUser = (req = request, res = response) => {
+const deleteUser = async (req = request, res = response) => {
   const { id } = req.params;
-  res.json({ msg: "Delete User - Controller", id });
+  const deletedUser = await User.findByIdAndUpdate(
+    id,
+    { activated: false },
+    { new: true }
+  ).populate("role", "name");
+  res.json({ msg: "Delete User - Controller", deletedUser });
 };
 
 module.exports = {
