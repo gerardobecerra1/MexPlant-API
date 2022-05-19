@@ -13,3 +13,5 @@ Recuerda que debes ejecutar `npm install` para reconstruir los modulos de Node.
 5.-Instalamos "bcryptjs" para que a nuestra API pueda encriptar campos como el password, con el comando `npm i bcryptjs`.
 
 6.-Instalamos "express-validator" para que a nuestra API valide campos con el formato correcto como el correo, con el comando `npm i express-validator`.
+
+7.-Instalamos "jsonwebtoken" para que a nuestra API valide quien puede hacer ciertas tareas con mayor seguridad, con el comando `npm i jsonwebtoken`.

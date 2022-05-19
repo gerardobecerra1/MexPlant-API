@@ -75,12 +75,16 @@ const updateUser = async (req = request, res = response) => {
 
 const deleteUser = async (req = request, res = response) => {
   const { id } = req.params;
+
   const deletedUser = await User.findByIdAndUpdate(
     id,
     { activated: false },
     { new: true }
   ).populate("role", "name");
-  res.json({ msg: "Delete User - Controller", deletedUser });
+
+  const authUser = req.authUser;
+
+  res.json({ msg: "Delete User - Controller", deletedUser, authUser });
 };
 
 module.exports = {

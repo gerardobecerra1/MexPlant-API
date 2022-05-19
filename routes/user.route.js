@@ -6,18 +6,15 @@ const {
   updateUser,
   deleteUser,
 } = require("../controllers/user.controller");
-const { validateFields } = require("../middlewares");
+const { validateFields, validateJWT, hasRole } = require("../middlewares");
 const {
   existRoleId,
   mailRegistered,
   existUserId,
   isActive,
-} = require("../helpers/db-validators.helper");
-
-const {
   paramNumericPositive,
   statusValidator,
-} = require("../helpers/param-validators.helper");
+} = require("../helpers");
 
 const router = Router();
 
@@ -35,10 +32,10 @@ router.get(
 router.post(
   "/",
   [
-    check("role", "Este campo es obligatorio").notEmpty(),
-    check("name", "Este campo es obligatorio").notEmpty(),
-    check("surname", "Este campo es obligatorio").notEmpty(),
-    check("mail", "Este campo es obligatorio").notEmpty(),
+    check(
+      ["role", "name", "surname", "mail"],
+      "Este campo es obligatorio"
+    ).notEmpty(),
     check("role", "No es un ID válido").isMongoId(),
     check("role").custom(existRoleId),
     check(
@@ -60,11 +57,9 @@ router.put(
   [
     check("id", "No es un ID válido").isMongoId(),
     check("id").custom(existUserId),
-    check("id").custom(isActive),
-    check(
-      "password",
-      "El password es obligatorio y debe contener almenos 8 caracteres"
-    ).isLength({ min: 8 }),
+    check("password", "El password debe contener almenos 8 caracteres")
+      .optional({ nullable: true })
+      .isLength({ min: 8 }),
     validateFields,
   ],
   updateUser
@@ -73,6 +68,8 @@ router.put(
 router.delete(
   "/:id",
   [
+    validateJWT,
+    hasRole("Administrador"),
     check("id", "No es un ID válido").isMongoId(),
     check("id").custom(existUserId),
     check("id").custom(isActive),

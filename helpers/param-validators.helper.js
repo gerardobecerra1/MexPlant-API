@@ -4,10 +4,7 @@ const paramNumericPositive = async (value) => {
 
   if (!arrayValue.includes(value)) {
     if (!regex.test(value)) {
-      throw new Error("Debe ser de tipo Numérico");
-    }
-    if (value < 0) {
-      throw new Error("No puede ser menor a cero");
+      throw new Error("Debe ser de tipo Numérico y no menor a 0");
     }
   }
 };
