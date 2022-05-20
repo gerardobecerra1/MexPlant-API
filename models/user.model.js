@@ -30,14 +30,10 @@ const UserSchema = Schema({
     type: Boolean,
     default: true,
   },
-  google: {
-    type: Boolean,
-    default: false,
-  },
 });
 
 UserSchema.methods.toJSON = function () {
-  const { password, google, _id, __v, ...user } = this.toObject();
+  const { password, _id, __v, ...user } = this.toObject();
   user.uid = _id;
   return user;
 };

@@ -7,6 +7,22 @@ const existRoleId = async (id = "") => {
   }
 };
 
+const roleRegistered = async (name = "") => {
+  const roleExist = await Role.findOne({ name });
+  if (roleExist) {
+    throw new Error(`El rol: '${name}' ya se encuentra registrado`);
+  }
+};
+
+const roleIsActive = async (id = "") => {
+  const role = await Role.findById(id);
+  if (!role.activated) {
+    throw new Error(
+      `El rol con id:'${id}' se encuentra inactivo, no se le pueden hacer ningún cambio`
+    );
+  }
+};
+
 const mailRegistered = async (mail = "") => {
   const mailExist = await User.findOne({ mail });
   if (mailExist) {
@@ -21,7 +37,7 @@ const existUserId = async (id = "") => {
   }
 };
 
-const isActive = async (id = "") => {
+const userIsActive = async (id = "") => {
   const user = await User.findById(id);
   if (!user.activated) {
     throw new Error(
@@ -30,9 +46,19 @@ const isActive = async (id = "") => {
   }
 };
 
+const userExist = async (mail = "") => {
+  const exist = await User.findOne({ mail });
+  if (!exist) {
+    throw new Error(`El correo: '${mail}' no existe`);
+  }
+};
+
 module.exports = {
   existRoleId,
+  roleRegistered,
+  roleIsActive,
   mailRegistered,
   existUserId,
-  isActive,
+  userIsActive,
+  userExist,
 };

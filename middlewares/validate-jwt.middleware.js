@@ -35,9 +35,8 @@ const validateJWT = async (req = request, res = response, next) => {
     req.authUser = authUser;
     next();
   } catch (error) {
-    console.log(error);
     return res.status(401).json({
-      msg: "Token no válido",
+      msg: "El Token expiró o no es válido",
     });
   }
 };

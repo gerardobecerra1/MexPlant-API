@@ -5,15 +5,15 @@ const {
   createUser,
   updateUser,
   deleteUser,
-} = require("../controllers/user.controller");
+} = require("../controllers");
 const { validateFields, validateJWT, hasRole } = require("../middlewares");
 const {
   existRoleId,
   mailRegistered,
   existUserId,
-  isActive,
   paramNumericPositive,
   statusValidator,
+  userIsActive,
 } = require("../helpers");
 
 const router = Router();
@@ -72,7 +72,7 @@ router.delete(
     hasRole("Administrador"),
     check("id", "No es un ID válido").isMongoId(),
     check("id").custom(existUserId),
-    check("id").custom(isActive),
+    check("id").custom(userIsActive),
     validateFields,
   ],
   deleteUser

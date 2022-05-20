@@ -1,9 +1,13 @@
-const Role = require("./role.model")
-const Server = require("./server")
-const User = require("./user.model")
+const Classification = require("./classification.model");
+const Plant = require("./plant.model");
+const Role = require("./role.model");
+const Server = require("./server");
+const User = require("./user.model");
 
 module.exports = {
-    Role,
-    Server,
-    User
-}
+  Classification,
+  Plant,
+  Role,
+  Server,
+  User,
+};

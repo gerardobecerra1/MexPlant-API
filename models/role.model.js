@@ -17,7 +17,7 @@ const RoleSchema = Schema({
 });
 
 RoleSchema.methods.toJSON = function () {
-  const { __v, activated, ...role } = this.toObject();
+  const { __v, ...role } = this.toObject();
   return role;
 };
 

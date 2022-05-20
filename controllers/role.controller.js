@@ -1,9 +1,35 @@
 const { response, request } = require("express"); // Para reconocer los metodos de estatus y json
 const Role = require("../models/role.model");
 
-const getRoles = (req = request, res = response) => {
-  const { from = 0, until = 0, limit = 0 } = req.query;
-  res.json({ msg: "Get Roles - Controller", from, until, limit });
+const getRoles = async (req = request, res = response) => {
+  const { limit = 0, from = 0, status = true } = req.query;
+
+  //Obtenemos dependiendo si estan activos o no
+  const query = { activated: status };
+
+  const [total, roles] = await Promise.all([
+    roleDocuments(query, limit, from, status).countDocuments(query),
+    roleDocuments(query, limit, from, status),
+  ]);
+
+  res.json({ msg: "Get Roles - Controller", total, roles });
+};
+
+const roleDocuments = (query = "", limit = 0, from = 0) => {
+  from = from > 0 ? from - 1 : from;
+  if (limit != 0) {
+    if (from != 0) {
+      return Role.find(query).skip(Number(from)).limit(Number(limit));
+    } else {
+      return Role.find(query).limit(Number(limit));
+    }
+  } else {
+    if (from != 0) {
+      return Role.find(query).skip(Number(from));
+    } else {
+      return Role.find(query);
+    }
+  }
 };
 
 const createRole = async (req = request, res = response) => {
@@ -15,14 +41,26 @@ const createRole = async (req = request, res = response) => {
   res.status(201).json({ msg: "Create Role - Controller", roleCreated }); //Si no agregamos status por defecto enviara un Ok:200
 };
 
-const updateRole = (req = request, res = response) => {
+const updateRole = async (req = request, res = response) => {
   const { id } = req.params;
-  res.json({ msg: "Update Role - Controller", id });
+  const { _id, ...rest } = req.body;
+
+  const updatedRole = await Role.findByIdAndUpdate(id, rest, { new: true });
+
+  res.json({ msg: "Update Role - Controller", updatedRole });
 };
 
-const deleteRole = (req = request, res = response) => {
+const deleteRole = async (req = request, res = response) => {
   const { id } = req.params;
-  res.json({ msg: "Delete Role - Controller", id });
+
+  const deletedRole = await Role.findByIdAndUpdate(
+    id,
+    { activated: false },
+    { new: true }
+  );
+
+  const authUser = req.authUser;
+  res.json({ msg: "Delete Role - Controller", deletedRole, authUser });
 };
 
 module.exports = {

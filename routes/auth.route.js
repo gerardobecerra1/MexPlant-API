@@ -1,12 +1,14 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
 const { login } = require("../controllers/auth.controller");
+const { userExist } = require("../helpers");
 const { validateFields } = require("../middlewares/validate-fields.middleware");
 const router = Router();
 
 router.post(
   "/login",
   [
+    check("mail").custom(userExist),
     check(["mail", "password"], "El campo es obligatorio").notEmpty(),
     check(
       "mail",
