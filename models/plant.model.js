@@ -36,7 +36,7 @@ const PlantSchema = Schema({
 });
 
 PlantSchema.methods.toJSON = function () {
-  const { __v, activated, ...data } = this.toObject();
+  const { __v, ...data } = this.toObject();
   return data;
 };
 
