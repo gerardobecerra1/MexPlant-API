@@ -1,4 +1,4 @@
-const { Role, User, Classification } = require("../models");
+const { Role, User, Classification, Plant } = require("../models");
 
 //#region Role
 const existRoleId = async (id = "") => {
@@ -18,9 +18,7 @@ const roleRegistered = async (name = "") => {
 const roleIsActive = async (id = "") => {
   const role = await Role.findById(id);
   if (!role.activated) {
-    throw new Error(
-      `El rol con id:'${id}' se encuentra inactivo, no se le puede hacer ningún cambio`
-    );
+    throw new Error(`El rol con id:'${id}' se encuentra inactivo`);
   }
 };
 //#endregion
@@ -43,9 +41,7 @@ const existUserId = async (id = "") => {
 const userIsActive = async (id = "") => {
   const user = await User.findById(id);
   if (!user.activated) {
-    throw new Error(
-      `El usuario con id:'${id}' se encuentra inactivo, no se le pueden hacer ningún cambio`
-    );
+    throw new Error(`El usuario con id:'${id}' se encuentra inactivo`);
   }
 };
 
@@ -75,12 +71,41 @@ const classificationRegistered = async (name = "") => {
 const classificationIsActive = async (id = "") => {
   const classification = await Classification.findById(id);
   if (!classification.activated) {
+    throw new Error(`La clasificación con id:'${id}' se encuentra inactiva`);
+  }
+};
+//#endregion
+
+//#region Classification
+const existPlantById = async (id) => {
+  const existPlant = await Plant.findById(id);
+  if (!existPlant) {
+    throw new Error(`El id: '${id}' no existe`);
+  }
+};
+
+const plantNameRegistered = async (name = "") => {
+  const plantExist = await Plant.findOne({ name });
+  if (plantExist) {
+    throw new Error(`La clasificación: '${name}' ya se encuentra registrada`);
+  }
+};
+
+const plantscientificNameRegistered = async (scientificName = "") => {
+  const plantExist = await Plant.findOne({ scientificName });
+  if (plantExist) {
     throw new Error(
-      `La clasificación con id:'${id}' se encuentra inactiva, no se le puede hacer ningún cambio`
+      `El nombre científico: '${scientificName}' ya se encuentra registrado`
     );
   }
 };
 
+const plantIsActive = async (id = "") => {
+  const plant = await Plant.findById(id);
+  if (!plant.activated) {
+    throw new Error(`La planta con id:'${id}' se encuentra inactiva`);
+  }
+};
 //#endregion
 
 module.exports = {
@@ -94,4 +119,8 @@ module.exports = {
   existClassificationById,
   classificationRegistered,
   classificationIsActive,
+  existPlantById,
+  plantNameRegistered,
+  plantscientificNameRegistered,
+  plantIsActive,
 };

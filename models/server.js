@@ -46,6 +46,7 @@ class Server {
       this.paths.classifications,
       require("../routes/classification.route")
     );
+    this.app.use(this.paths.plants, require("../routes/plant.route"));
     this.app.use(this.paths.roles, require("../routes/role.route"));
     this.app.use(this.paths.users, require("../routes/user.route"));
   }

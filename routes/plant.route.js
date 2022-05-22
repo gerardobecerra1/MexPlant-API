@@ -2,73 +2,73 @@ const { Router } = require("express");
 const { check } = require("express-validator");
 const {
   createPlant,
-  getPlants,
-  getPlantById,
   updatePlant,
   deletePlant,
 } = require("../controllers/plant.controller");
 const {
   existClassificationById,
-  isValidRole,
-} = require("../helpers/db-validators.helper");
-const { existPlantById } = require("../helpers/db-validators.helper");
+  existPlantById,
+  classificationIsActive,
+  plantNameRegistered,
+  plantscientificNameRegistered,
+  plantIsActive,
+} = require("../helpers");
 const { validateJWT, validateFields, hasRole } = require("../middlewares");
 
 const router = Router();
 
-//Obtener todas las plantas - publico
-router.get("/", getPlants);
-
-//Obtener todas las plantas - publico
-router.get(
-  "/:id",
-  [
-    check("id", "No es un id de Mongo válido").isMongoId(),
-    check("id").custom(existPlantById),
-    validateFields,
-  ],
-  getPlantById
-);
-
-//Crear planta - privado - Cualquier persona con un token válido
 router.post(
   "/",
   [
     validateJWT,
-    check("classification", "La clasificiación es obligatoria").not().isEmpty(),
+    hasRole("Administrador"),
+    check(
+      ["classification", "name", "scientificName", "description"],
+      "Este campo es obligatorio"
+    ).notEmpty(),
     check("classification", "No es un id de Mongo válido").isMongoId(),
     check("classification").custom(existClassificationById),
-    check("name", "El nombre es obligatorio").not().isEmpty(),
-    check("scientificName", "El nombre científco es obligatorio")
-      .not()
-      .isEmpty(),
-    check("description", "La descripción es obligatoria").not().isEmpty(),
+    check("classification").custom(classificationIsActive),
+    check("name").custom(plantNameRegistered),
+    check("scientificName").custom(plantscientificNameRegistered),
     validateFields,
   ],
   createPlant
 );
 
-//Actualizar planta por id- privado - Cualquier persona con un token válido
 router.put(
   "/:id",
   [
     validateJWT,
-    hasRole("Administrador", "Colaborador"),
-    check("id", "No es un id de Mongo válido").isMongoId(),
+    hasRole("Administrador"),
+    check("id", "No es un ID válido").isMongoId(),
     check("id").custom(existPlantById),
+    check("classification", "No es un ID válido")
+      .optional({ nullable: true })
+      .isMongoId(),
+    check("classification")
+      .optional({ nullable: true })
+      .custom(existClassificationById),
+    check("classification")
+      .optional({ nullable: true })
+      .custom(classificationIsActive),
+    check("name").optional({ nullable: true }).custom(plantNameRegistered),
+    check("scientificName")
+      .optional({ nullable: true })
+      .custom(plantscientificNameRegistered),
     validateFields,
   ],
   updatePlant
 );
 
-//Borrar planta por id- privado - Solo el Administrador puede Borrar
 router.delete(
   "/:id",
   [
     validateJWT,
-    hasRole("Administrador", "Colaborador"),
+    hasRole("Administrador"),
     check("id", "No es un id de Mongo válido").isMongoId(),
     check("id").custom(existPlantById),
+    check("id").custom(plantIsActive),
     validateFields,
   ],
   deletePlant

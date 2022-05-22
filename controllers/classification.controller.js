@@ -26,9 +26,8 @@ const updateClassification = async (req, res = response) => {
   const { id } = req.params;
   const { user, _id, ...data } = req.body;
 
-  const authUser = req.authUser;
   //Asignamos al ultimo usuario que lo actualizó
-  data.user = authUser._id;
+  data.user = req.authUser._id;
 
   const updatedClassification = await Classification.findByIdAndUpdate(
     id,
@@ -41,7 +40,6 @@ const updateClassification = async (req, res = response) => {
   res.status(201).json({
     msg: "Update Classification - Controller",
     updatedClassification,
-    authUser,
   });
 };
 
@@ -55,12 +53,9 @@ const deleteClassification = async (req, res = response) => {
     { new: true }
   );
 
-  const authUser = req.authUser;
-
   res.json({
     msg: "Delete Classification - Controller",
     classificationDeleted,
-    authUser,
   });
 };
 
