@@ -1,33 +1,15 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const {
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser,
-} = require("../controllers");
+const { createUser, updateUser, deleteUser } = require("../controllers");
 const { validateFields, validateJWT, hasRole } = require("../middlewares");
 const {
   existRoleId,
   mailRegistered,
   existUserId,
-  paramNumericPositive,
-  statusValidator,
   userIsActive,
 } = require("../helpers");
 
 const router = Router();
-
-router.get(
-  "/",
-  [
-    check("limit").custom(paramNumericPositive),
-    check("from").custom(paramNumericPositive),
-    check("status").custom(statusValidator),
-    validateFields,
-  ],
-  getUser
-);
 
 router.post(
   "/",

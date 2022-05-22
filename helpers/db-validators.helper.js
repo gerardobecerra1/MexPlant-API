@@ -1,5 +1,6 @@
-const { Role, User } = require("../models");
+const { Role, User, Classification } = require("../models");
 
+//#region Role
 const existRoleId = async (id = "") => {
   const role = await Role.findById(id);
   if (!role) {
@@ -18,11 +19,13 @@ const roleIsActive = async (id = "") => {
   const role = await Role.findById(id);
   if (!role.activated) {
     throw new Error(
-      `El rol con id:'${id}' se encuentra inactivo, no se le pueden hacer ningún cambio`
+      `El rol con id:'${id}' se encuentra inactivo, no se le puede hacer ningún cambio`
     );
   }
 };
+//#endregion
 
+//#region User
 const mailRegistered = async (mail = "") => {
   const mailExist = await User.findOne({ mail });
   if (mailExist) {
@@ -52,6 +55,33 @@ const userExist = async (mail = "") => {
     throw new Error(`El correo: '${mail}' no existe`);
   }
 };
+//#endregion
+
+//#region Classification
+const existClassificationById = async (id) => {
+  const existClassification = await Classification.findById(id);
+  if (!existClassification) {
+    throw new Error(`El id: '${id}' no existe`);
+  }
+};
+
+const classificationRegistered = async (name = "") => {
+  const classificationExist = await Classification.findOne({ name });
+  if (classificationExist) {
+    throw new Error(`La clasificación: '${name}' ya se encuentra registrada`);
+  }
+};
+
+const classificationIsActive = async (id = "") => {
+  const classification = await Classification.findById(id);
+  if (!classification.activated) {
+    throw new Error(
+      `La clasificación con id:'${id}' se encuentra inactiva, no se le puede hacer ningún cambio`
+    );
+  }
+};
+
+//#endregion
 
 module.exports = {
   existRoleId,
@@ -61,4 +91,7 @@ module.exports = {
   existUserId,
   userIsActive,
   userExist,
+  existClassificationById,
+  classificationRegistered,
+  classificationIsActive,
 };

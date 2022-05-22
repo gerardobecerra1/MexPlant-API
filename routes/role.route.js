@@ -1,32 +1,10 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const {
-  getRoles,
-  createRole,
-  updateRole,
-  deleteRole,
-} = require("../controllers");
-const {
-  roleRegistered,
-  existRoleId,
-  paramNumericPositive,
-  statusValidator,
-  roleIsActive,
-} = require("../helpers");
+const { createRole, updateRole, deleteRole } = require("../controllers");
+const { roleRegistered, existRoleId, roleIsActive } = require("../helpers");
 const { validateFields, validateJWT, hasRole } = require("../middlewares");
 
 const router = Router();
-
-router.get(
-  "/",
-  [
-    check("limit").custom(paramNumericPositive),
-    check("from").custom(paramNumericPositive),
-    check("status").custom(statusValidator),
-    validateFields,
-  ],
-  getRoles
-);
 
 router.post(
   "/",
