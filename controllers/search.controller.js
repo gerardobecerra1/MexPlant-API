@@ -10,15 +10,28 @@ const searchClassififcation = async (term = "", res = response) => {
         "user",
         "name"
       );
-      res.json({ results: classififcation ? [classififcation] : [] });
+      res.json({
+        msg: "Classification By ID",
+        results: classififcation ? [classififcation] : [],
+      });
     } else {
       const regex = new RegExp(term, "i");
 
-      const classififcations = await Classification.find({
+      const query = {
         $or: [{ name: regex }, { description: regex }],
         $and: [{ activated: true }],
-      }).populate("user", "name");
-      res.json({ results: classififcations });
+      };
+
+      const [total, classififcations] = await Promise.all([
+        Classification.find(query).countDocuments(query),
+        Classification.find(query).populate("user", "name"),
+      ]);
+
+      res.json({
+        msg: "Classifications By Fields",
+        total,
+        results: classififcations,
+      });
     }
   } catch (error) {
     console.log(error);
@@ -28,16 +41,20 @@ const searchClassififcation = async (term = "", res = response) => {
   }
 };
 
-const searchPlantByClassification = async (term = "", res = response) => {
+const searchClassificationsByUser = async (term = "", res = response) => {
   try {
     const isMongoId = ObjectId.isValid(term);
-    const query = { classification: ObjectId(term) };
+    const query = { user: ObjectId(term) };
     if (isMongoId) {
-      const plantByClassification = await Plant.find(query)
-        .populate("user", "name")
-        .populate("classification", "name");
+      const [total, classififcation] = await Promise.all([
+        Classification.find(query).countDocuments(query),
+        Classification.find(query).populate("user", "name"),
+      ]);
+
       res.json({
-        results: plantByClassification ? [plantByClassification] : [],
+        msg: "Classifications By User",
+        total,
+        results: classififcation ? [classififcation] : [],
       });
     }
   } catch (error) {
@@ -55,21 +72,32 @@ const searchPlant = async (term = "", res = response) => {
       const plant = await Plant.findById(term)
         .populate("user", "name")
         .populate("classification", "name");
-      res.json({ results: plant ? [plant] : [] });
+      res.json({ msg: "Plant By ID", results: plant ? [plant] : [] });
     } else {
       const regex = new RegExp(term, "i");
 
-      const plants = await Plant.find({
-        $or: [
-          { name: regex },
-          { scientificName: regex },
-          { description: regex },
-        ],
-        $and: [{ activated: true }],
-      })
-        .populate("user", "name")
-        .populate("classification", "name");
-      res.json({ results: plants });
+      const [total, plants] = await Promise.all([
+        Plant.find({
+          $or: [
+            { name: regex },
+            { scientificName: regex },
+            { description: regex },
+          ],
+          $and: [{ activated: true }],
+        }).countDocuments({ activated: true }),
+        Plant.find({
+          $or: [
+            { name: regex },
+            { scientificName: regex },
+            { description: regex },
+          ],
+          $and: [{ activated: true }],
+        })
+          .populate("user", "name")
+          .populate("classification", "name"),
+      ]);
+
+      res.json({ msg: "Plants By Fileds", total, results: plants });
     }
   } catch (error) {
     console.log(error);
@@ -79,20 +107,78 @@ const searchPlant = async (term = "", res = response) => {
   }
 };
 
+const searchPlantsByClassification = async (term = "", res = response) => {
+  try {
+    const isMongoId = ObjectId.isValid(term);
+    const query = { classification: ObjectId(term) };
+    if (isMongoId) {
+      const [total, plants] = await Promise.all([
+        Plant.find(query).countDocuments(query),
+        Plant.find(query)
+          .populate("user", "name")
+          .populate("classification", "name"),
+      ]);
+
+      res.json({
+        msg: "Plants By Classification",
+        total,
+        results: plants ? [plants] : [],
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: "No es un ID válido",
+    });
+  }
+};
+
+const searchPlantsByUser = async (term = "", res = response) => {
+  try {
+    const isMongoId = ObjectId.isValid(term);
+    const query = { user: ObjectId(term) };
+    if (isMongoId) {
+      const [total, plants] = await Promise.all([
+        Plant.find(query).countDocuments(query),
+        Plant.find(query)
+          .populate("user", "name")
+          .populate("classification", "name"),
+      ]);
+
+      res.json({
+        msg: "Plants By User",
+        total,
+        results: plants ? [plants] : [],
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: "No es un ID válido",
+    });
+  }
+};
+
 const searchRole = async (term = "", res = response) => {
   try {
     const isMongoId = ObjectId.isValid(term);
     if (isMongoId) {
       const role = await Role.findById(term);
-      res.json({ results: role ? [role] : [] });
+      res.json({ msg: "Role By ID", results: role ? [role] : [] });
     } else {
       const regex = new RegExp(term, "i");
 
-      const roles = await Role.find({
+      const query = {
         $or: [{ name: regex }, { description: regex }],
         $and: [{ activated: true }],
-      });
-      res.json({ results: roles });
+      };
+
+      const [total, roles] = await Promise.all([
+        Role.find(query).countDocuments(query),
+        Role.find(query),
+      ]);
+
+      res.json({ msg: "Roles By Fields", total, results: roles });
     }
   } catch (error) {
     console.log(error);
@@ -107,20 +193,50 @@ const searchUser = async (term = "", res = response) => {
     const isMongoId = ObjectId.isValid(term);
     if (isMongoId) {
       const user = await User.findById(term);
-      res.json({ results: user ? [user] : [] });
+      res.json({ msg: "User By ID", results: user ? [user] : [] });
     } else {
       const regex = new RegExp(term, "i");
 
-      const users = await User.find({
+      const query = {
         $or: [{ name: regex }, { surname: regex }, { mail: regex }],
         $and: [{ activated: true }],
-      });
-      res.json({ results: users });
+      };
+
+      const [total, users] = await Promise.all([
+        User.find(query).countDocuments(query),
+        User.find(query),
+      ]);
+
+      res.json({ msg: "Users By Fields", total, results: users });
     }
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       msg: "Hable con el administrador",
+    });
+  }
+};
+
+const searchUsersByRole = async (term = "", res = response) => {
+  try {
+    const isMongoId = ObjectId.isValid(term);
+    const query = { role: ObjectId(term) };
+    if (isMongoId) {
+      const [total, users] = await Promise.all([
+        User.find(query).countDocuments(query),
+        User.find(query).populate("role", "name"),
+      ]);
+
+      res.json({
+        msg: "Users By Role",
+        total,
+        results: users ? [users] : [],
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: "No es un ID válido",
     });
   }
 };
@@ -132,11 +248,17 @@ const search = (req, res = response) => {
     case "classifications":
       searchClassififcation(term, res);
       break;
+    case "classificationsByUser":
+      searchClassificationsByUser(term, res);
+      break;
     case "plants":
       searchPlant(term, res);
       break;
     case "plantsByClassification":
-      searchPlantByClassification(term, res);
+      searchPlantsByClassification(term, res);
+      break;
+    case "plantsByUser":
+      searchPlantsByUser(term, res);
       break;
     case "roles":
       searchRole(term, res);
@@ -144,10 +266,12 @@ const search = (req, res = response) => {
     case "users":
       searchUser(term, res);
       break;
-
+    case "usersByRole":
+      searchUsersByRole(term, res);
+      break;
     default:
       res.status(500).json({
-        msg: "Se le olvido hacer esta búsqueda",
+        msg: "La colleción no coincide con nunguna de permitida",
       });
       break;
   }

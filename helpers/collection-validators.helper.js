@@ -1,8 +1,10 @@
 const allowedCollection = async (collection = "") => {
   const collections = [
     "classifications",
+    "classificationsByUser",
     "plants",
     "plantsByClassification",
+    "plantsByUser",
     "roles",
     "users",
     "usersByRole",
