@@ -15,3 +15,7 @@ Recuerda que debes ejecutar `npm install` para reconstruir los modulos de Node.
 6.-Instalamos "express-validator" para que a nuestra API valide campos con el formato correcto como el correo, con el comando `npm i express-validator`.
 
 7.-Instalamos "jsonwebtoken" para que a nuestra API valide quien puede hacer ciertas tareas con mayor seguridad, con el comando `npm i jsonwebtoken`.
+
+8.-Instalamos "express-fileupload" para que a nuestra API pueda guardar archivos, con el comando `npm i express-fileupload`.
+
+9.-Instalamos "cloudinary" para que a nuestra API pueda guardar archivosen la nube, con el comando `npm i cloudinary`.
