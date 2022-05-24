@@ -1,3 +1,4 @@
+const { request } = require("express");
 const { response } = require("express");
 const { Plant } = require("../models");
 
@@ -6,6 +7,18 @@ const cloudinary = require("cloudinary").v2;
 cloudinary.config(process.env.CLOUDINARY_URL);
 
 const validExtensions = ["jpg", "jpeg", "png"];
+
+const getRandomPlant = async (req = request, res = response) => {
+  try {
+    const randomPlant = await Plant.aggregate([
+      { $match: { activated: true } },
+      { $sample: { size: 1 } },
+    ]);
+    res.status(200).json({ msg: "Create Plant - Controller", randomPlant });
+  } catch (error) {
+    res.status(500).json({ msg: "Get Random Plant - Error", error });
+  }
+};
 
 const createPlant = async (req, res = response) => {
   const { activated, user, ...body } = req.body;
@@ -102,6 +115,7 @@ const deletePlant = async (req, res = response) => {
 };
 
 module.exports = {
+  getRandomPlant,
   createPlant,
   updatePlant,
   deletePlant,

@@ -1,18 +1,24 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { search, searchPagination } = require("../controllers");
+const {
+  search,
+  searchPagination,
+  searchPlantsByClassifications,
+} = require("../controllers");
 const {
   paramNumericPositive,
   statusValidator,
   allowedCollection,
 } = require("../helpers");
-const { validateFields } = require("../middlewares");
+const { validateFields, hasRole, validateJWT } = require("../middlewares");
 
 const router = Router();
 
 router.get(
   "/:collection",
   [
+    validateJWT,
+    hasRole("Administrador"),
     check("collection").custom(allowedCollection),
     check("limit").custom(paramNumericPositive),
     check("from").custom(paramNumericPositive),
@@ -24,7 +30,12 @@ router.get(
 
 router.get(
   "/:collection/:term",
-  [check("collection").custom(allowedCollection), validateFields],
+  [
+    validateJWT,
+    hasRole("Administrador"),
+    check("collection").custom(allowedCollection),
+    validateFields,
+  ],
   search
 );
 

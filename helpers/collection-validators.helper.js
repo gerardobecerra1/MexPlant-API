@@ -4,6 +4,7 @@ const allowedCollection = async (collection = "") => {
     "classificationsByUser",
     "plants",
     "plantsByClassification",
+    "listPlantsByClassifications",
     "plantsByUser",
     "roles",
     "users",

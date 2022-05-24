@@ -4,7 +4,8 @@ const {
   createPlant,
   updatePlant,
   deletePlant,
-} = require("../controllers/plant.controller");
+  getRandomPlant,
+} = require("../controllers");
 const {
   existClassificationById,
   existPlantById,
@@ -16,6 +17,12 @@ const {
 const { validateJWT, validateFields, hasRole } = require("../middlewares");
 
 const router = Router();
+
+router.get(
+  "/random",
+  [validateJWT, hasRole("Administrador"), validateFields],
+  getRandomPlant
+);
 
 router.post(
   "/",

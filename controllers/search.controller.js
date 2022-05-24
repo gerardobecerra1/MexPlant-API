@@ -133,6 +133,21 @@ const searchPlantsByClassification = async (term = "", res = response) => {
   }
 };
 
+const searchPlantsByClassifications = async (model = "", res = response) => {
+  try {
+    const plants = await Promise.all([
+      model.find().populate("classification", "name"),
+    ]);
+
+    console.log(total, plants);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: "Consulte a un administrador",
+    });
+  }
+};
+
 const searchPlantsByUser = async (term = "", res = response) => {
   try {
     const isMongoId = ObjectId.isValid(term);
@@ -316,6 +331,9 @@ const searchPagination = async (req = request, res = response) => {
     case "users":
       mongoModel = User;
       break;
+    case "listPlantsByClassifications":
+      mongoModel = Classification;
+      break;
     default:
       res.status(500).json({
         msg: "Se le olvido hacer esta búsqueda",
@@ -323,16 +341,36 @@ const searchPagination = async (req = request, res = response) => {
       break;
   }
 
-  const [total, results] = await Promise.all([
-    getDocuments(mongoModel, query, limit, from, status).countDocuments(query),
-    getDocuments(mongoModel, query, limit, from, status),
-  ]);
+  if (collection === "listPlantsByClassifications") {
+    const list = await mongoModel.aggregate([
+      {
+        $lookup: {
+          from: "plants",
+          localField: "_id",
+          foreignField: "classification",
+          as: "plants",
+        },
+      },
+    ]);
 
-  res.json({
-    msg: "Search - Controller",
-    total,
-    results,
-  });
+    res.json({
+      msg: "Search - Controller",
+      list,
+    });
+  } else {
+    const [total, results] = await Promise.all([
+      getDocuments(mongoModel, query, limit, from, status).countDocuments(
+        query
+      ),
+      getDocuments(mongoModel, query, limit, from, status),
+    ]);
+
+    res.json({
+      msg: "Search - Controller",
+      total,
+      results,
+    });
+  }
 };
 
 module.exports = {
