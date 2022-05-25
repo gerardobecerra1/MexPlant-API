@@ -1,5 +1,6 @@
 const { request, response } = require("express");
 const { Classification, Plant, Role, User } = require("../models");
+const { populate } = require("../models/user.model");
 const { ObjectId } = require("mongoose").Types;
 
 const searchClassififcation = async (term = "", res = response) => {
@@ -362,7 +363,12 @@ const searchPagination = async (req = request, res = response) => {
       getDocuments(mongoModel, query, limit, from, status).countDocuments(
         query
       ),
-      getDocuments(mongoModel, query, limit, from, status),
+      collection === "plants"
+        ? getDocuments(mongoModel, query, limit, from, status).populate(
+            "classification",
+            "name"
+          )
+        : getDocuments(mongoModel, query, limit, from, status),
     ]);
 
     res.json({
