@@ -20,7 +20,6 @@ const router = Router();
 
 router.get(
   "/random",
-  [validateJWT, hasRole("Administrador"), validateFields],
   getRandomPlant
 );
 

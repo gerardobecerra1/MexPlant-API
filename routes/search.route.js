@@ -17,8 +17,6 @@ const router = Router();
 router.get(
   "/:collection",
   [
-    validateJWT,
-    hasRole("Administrador"),
     check("collection").custom(allowedCollection),
     check("limit").custom(paramNumericPositive),
     check("from").custom(paramNumericPositive),
@@ -31,8 +29,6 @@ router.get(
 router.get(
   "/:collection/:term",
   [
-    validateJWT,
-    hasRole("Administrador"),
     check("collection").custom(allowedCollection),
     validateFields,
   ],
